@@ -24,7 +24,6 @@ ENV PORT 80
 EXPOSE 80
 
 # Load environment variables from .env file
-ENV ENV_FILE_PATH .env
 ENV DB_HOST=${DB_HOST}
 ENV DB_PORT=${DB_PORT}
 ENV DB_NAME=${DB_NAME}
