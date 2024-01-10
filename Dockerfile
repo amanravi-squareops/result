@@ -25,11 +25,11 @@ EXPOSE 80
 
 # Load environment variables from .env file
 ENV ENV_FILE_PATH .env
-ENV DB_HOST db
-ENV DB_PORT 4000
-ENV DB_NAME postgres
-ENV DB_USER postgres
-ENV DB_PASSWORD postgres
+ENV DB_HOST=${DB_HOST}
+ENV DB_PORT=${DB_PORT}
+ENV DB_NAME=${DB_NAME}
+ENV DB_USER=${DB_USER}
+ENV DB_PASSWORD=${DB_PASSWORD}
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["node", "server.js"]
