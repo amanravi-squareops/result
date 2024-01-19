@@ -6,21 +6,19 @@ var express = require('express'),
     server = require('http').Server(app),
     io = require('socket.io')(server),
     path = require('path'),
-    dotenv = require('dotenv'); // Added dotenv
+    dotenv = require('dotenv');
 
-dotenv.config(); // Load environment variables from .env file
+dotenv.config();
 
 var port = process.env.PORT || 5432;
-var dbHost = process.env.DB_HOST || 'db';
+var dbHost = 'postgresql-ha-postgresql.app.svc'; // Updated DB host (hardcoded)
 var dbName = process.env.DB_NAME || 'postgres';
 var dbUser = process.env.DB_USER || 'postgres';
 var dbPassword = process.env.DB_PASSWORD || 'postgres';
-var dbConnectionString = process.env.DATABASE_URL || 'postgres://' + dbUser + ':' + dbPassword + '@' + dbHost + '/' + dbName || 'postgres://postgres:postgres@db/postgres'; // Use DATABASE_URL from .env or default value
+var dbConnectionString = 'postgres://' + dbUser + ':' + dbPassword + '@' + dbHost + '/' + dbName; // Updated connection string (hardcoded)
 
 io.on('connection', function (socket) {
-
-  socket.emit('message', { text : 'Welcome!' });
-
+  socket.emit('message', { text: 'Welcome!' });
   socket.on('subscribe', function (data) {
     socket.join(data.channel);
   });
@@ -31,16 +29,16 @@ var pool = new Pool({
 });
 
 async.retry(
-  {times: 1000, interval: 1000},
-  function(callback) {
-    pool.connect(function(err, client, done) {
+  { times: 1000, interval: 1000 },
+  function (callback) {
+    pool.connect(function (err, client, done) {
       if (err) {
         console.error("Waiting for db");
       }
       callback(err, client);
     });
   },
-  function(err, client) {
+  function (err, client) {
     if (err) {
       return console.error("Giving up");
     }
@@ -50,7 +48,7 @@ async.retry(
 );
 
 function getVotes(client) {
-  client.query('SELECT vote, COUNT(id) AS count FROM votes GROUP BY vote', [], function(err, result) {
+  client.query('SELECT vote, COUNT(id) AS count FROM votes GROUP BY vote', [], function (err, result) {
     if (err) {
       console.error("Error performing query: " + err);
     } else {
@@ -58,12 +56,12 @@ function getVotes(client) {
       io.sockets.emit("scores", JSON.stringify(votes));
     }
 
-    setTimeout(function() {getVotes(client) }, 1000);
+    setTimeout(function () { getVotes(client) }, 1000);
   });
 }
 
 function collectVotesFromResult(result) {
-  var votes = {a: 0, b: 0};
+  var votes = { a: 0, b: 0 };
 
   result.rows.forEach(function (row) {
     votes[row.vote] = parseInt(row.count);
@@ -84,4 +82,3 @@ server.listen(port, function () {
   var port = server.address().port;
   console.log('App running on port ' + port);
 });
-
