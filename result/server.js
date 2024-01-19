@@ -43,7 +43,25 @@ async.retry(
       return console.error("Giving up");
     }
     console.log("Connected to db");
-    getVotes(client);
+
+    // Check if 'votes' table exists, and create it if not
+    client.query(
+      `CREATE TABLE IF NOT EXISTS votes (
+         id SERIAL PRIMARY KEY,
+         vote VARCHAR(255) NOT NULL
+       );`,
+      [],
+      function (err, result) {
+        if (err) {
+          console.error("Error creating 'votes' table: " + err);
+        } else {
+          console.log("Table 'votes' created or already exists.");
+        }
+
+        // Continue with fetching votes
+        getVotes(client);
+      }
+    );
   }
 );
 
