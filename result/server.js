@@ -28,45 +28,36 @@ var pool = new Pool({
   connectionString: dbConnectionString
 });
 
-async.retry(
-  { times: 1000, interval: 1000 },
-  function (callback) {
-    pool.connect(function (err, client, done) {
-      if (err) {
-        console.error("Waiting for db");
-      }
-      callback(err, client);
-    });
-  },
-  function (err, client) {
-    if (err) {
-      return console.error("Giving up");
-    }
-    console.log("Connected to db");
-
-    // Check if 'votes' table exists, and create it if not
-    client.query(
-      `CREATE TABLE IF NOT EXISTS votes (
-         id SERIAL PRIMARY KEY,
-         vote VARCHAR(255) NOT NULL
-       );`,
-      [],
-      function (err, result) {
-        if (err) {
-          console.error("Error creating 'votes' table: " + err);
-        } else {
-          console.log("Table 'votes' created or already exists.");
-        }
-
-        // Continue with fetching votes
-        getVotes(client);
-      }
-    );
+// Connect to the database and create 'votes' table if not exists
+pool.connect(function (err, client, done) {
+  if (err) {
+    console.error("Error connecting to db: " + err);
+    return process.exit(1);
   }
-);
 
-function getVotes(client) {
-  client.query('SELECT vote, COUNT(id) AS count FROM votes GROUP BY vote', [], function (err, result) {
+  client.query(
+    `CREATE TABLE IF NOT EXISTS votes (
+       id SERIAL PRIMARY KEY,
+       vote VARCHAR(255) NOT NULL
+     );`,
+    function (err, result) {
+      done(); // Release the client back to the pool
+
+      if (err) {
+        console.error("Error creating 'votes' table: " + err);
+        return process.exit(1);
+      }
+
+      console.log("Table 'votes' created or already exists.");
+
+      // Continue with fetching votes
+      getVotes();
+    }
+  );
+});
+
+function getVotes() {
+  pool.query('SELECT vote, COUNT(id) AS count FROM votes GROUP BY vote', function (err, result) {
     if (err) {
       console.error("Error performing query: " + err);
     } else {
@@ -74,7 +65,7 @@ function getVotes(client) {
       io.sockets.emit("scores", JSON.stringify(votes));
     }
 
-    setTimeout(function () { getVotes(client) }, 1000);
+    setTimeout(getVotes, 1000);
   });
 }
 
