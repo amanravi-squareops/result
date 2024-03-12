@@ -24,8 +24,8 @@ ENV PORT 80
 EXPOSE 80
 
 # Load environment variables from .env file
-#ENV ENV_FILE_PATH .env
-#ENV $(cat $ENV_FILE_PATH | xargs)
+ENV ENV_FILE_PATH .env
+ENV $(cat $ENV_FILE_PATH | xargs)
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["node", "server.js"]
