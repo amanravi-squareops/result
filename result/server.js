@@ -13,9 +13,9 @@ dotenv.config();
 var port = process.env.PORT || 5432;
 // var dbHost = 'postgresql-ha-postgresql.app.svc'; // Updated DB host (hardcoded)
 var dbHost = process.env.DB_HOST ||'postgress-postgresql-primary'; // Updated DB host (hardcoded)
-var dbName = process.env.DB_NAME || 'postgres';
+var dbName = process.env.DB_NAME || 'atm_postgres';
 var dbUser = process.env.DB_USER || 'postgres';
-var dbPassword = process.env.DB_PASSWORD || 'postgres';
+var dbPassword = process.env.DB_PASSWORD || 'Aman123';
 var dbConnectionString = 'postgres://' + dbUser + ':' + dbPassword + '@' + dbHost + '/' + dbName; // Updated connection string (hardcoded)
 
 io.on('connection', function (socket) {
