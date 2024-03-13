@@ -11,7 +11,8 @@ var express = require('express'),
 dotenv.config();
 
 var port = process.env.PORT || 5432;
-var dbHost = 'postgresql-ha-postgresql.app.svc'; // Updated DB host (hardcoded)
+// var dbHost = 'postgresql-ha-postgresql.app.svc'; // Updated DB host (hardcoded)
+var dbHost = process.env.DB_HOST ||'postgress-postgresql-primary'; // Updated DB host (hardcoded)
 var dbName = process.env.DB_NAME || 'postgres';
 var dbUser = process.env.DB_USER || 'postgres';
 var dbPassword = process.env.DB_PASSWORD || 'postgres';
