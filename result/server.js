@@ -3,20 +3,21 @@ var express = require('express'),
     { Pool } = require('pg'),
     cookieParser = require('cookie-parser'),
     app = express(),
-    server = require('http').Server(app),
+    server = require('http').createServer(app), // Create server with app
     io = require('socket.io')(server),
     path = require('path'),
     dotenv = require('dotenv');
 
 dotenv.config();
 
-var port = process.env.PORT || '80';
-// var dbHost = 'postgresql-ha-postgresql.app.svc'; // Updated DB host (hardcoded)
-var dbHost = process.env.DB_HOST || 'postgress-postgresql-primary'; // Updated DB host (hardcoded)
-var dbName = process.env.DB_NAME || 'atm_postgres';
+var port = process.env.PORT || 80; // Use the PORT environment variable or default to 80
+
+var dbHost = process.env.DB_HOST || 'db';
+var dbPort = process.env.DB_PORT || 5432;
+var dbName = process.env.DB_NAME || 'postgres';
 var dbUser = process.env.DB_USER || 'postgres';
-var dbPassword = process.env.DB_PASSWORD || 'Aman123';
-var dbConnectionString = 'postgres://' + dbUser + ':' + dbPassword + '@' + dbHost + '/' + dbName; // Updated connection string (hardcoded)
+var dbPassword = process.env.DB_PASSWORD || 'postgres';
+var dbConnectionString = 'postgres://' + dbUser + ':' + dbPassword + '@' + dbHost + ':' + dbPort + '/' + dbName;
 
 io.on('connection', function (socket) {
   socket.emit('message', { text: 'Welcome!' });
@@ -80,6 +81,5 @@ app.get('/', function (req, res) {
 });
 
 server.listen(port, function () {
-  var port = server.address().port;
   console.log('App running on port ' + port);
 });
