@@ -7,6 +7,9 @@ var express = require('express'),
     io = require('socket.io')(server),
     path = require('path'),
     dotenv = require('dotenv');
+    password = "amanrajj"
+    AWS_ACCESS_KEY = "dcdsv-sf-aefefef-aefegg"
+    AWS_SECRET_KEY = "qdsftggffkkdldldldldldld"
 
 dotenv.config();
 
